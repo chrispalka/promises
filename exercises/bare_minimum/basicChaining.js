@@ -7,14 +7,31 @@
  *
  * HINT: We exported some similar promise-returning functions in previous exercises
  */
+var Promisification = require('./promisification.js');
 
 var fs = require('fs');
 var Promise = require('bluebird');
+Promise.promisifyAll(fs);
+
+
+
 
 
 
 var fetchProfileAndWriteToFile = function(readFilePath, writeFilePath) {
   // TODO
+  return fs.readFileAsync(readFilePath, 'utf8')
+    .then(function(file) {
+      var user = file.split('\n')[0];
+      return user;
+    })
+    .then(function(user) {
+      return Promisification.getGitHubProfileAsync(user);
+    })
+    .then(function(body) {
+      // console.log('body***', body);
+      return fs.writeFileAsync(writeFilePath, JSON.stringify(body));
+    });
 };
 
 // Export these functions so we can test them
